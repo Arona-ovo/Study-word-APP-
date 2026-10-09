@@ -1,5 +1,5 @@
-# Study-word-APP-
-一个AI背单词APP，纯本地，但可接入API实现联网和导入
+# Study Word-APP AWword
+一个AI背单词APP，纯本地，可接入API实现联网和导入
 <div align="center">
 
 <img src="uniapp/static/mascot.jpg" alt="AWword" width="120" style="border-radius:24px" />
