@@ -1,0 +1,40 @@
+# ---- HBuilderX / uni-app ----
+# 云打包与运行产物（含 app-service.js、apk、wgt 等生成文件）
+# 注意：gitignore 的行尾 # 不是注释，会让整条规则失效，注释必须独占一行
+unpackage/
+unpackage/**
+.hbuilderx/
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---- 构建产物：任何位置的二进制包都不入库 ----
+*.apk
+*.aab
+*.wgt
+*.ipa
+
+# ---- 校验脚本的临时目录 ----
+_tools/.tmp/
+
+# ---- 临时 / 调试残留 ----
+*.tmp
+_big.tmp
+_probe.tmp
+_probe.txt
+processed_image_*.png
+
+# ---- WorkBuddy 工作区数据（非工程文件） ----
+.workbuddy/
+
+# ---- 本地环境 / 密钥 ----
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db

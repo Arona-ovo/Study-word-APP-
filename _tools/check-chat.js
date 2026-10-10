@@ -1,0 +1,431 @@
+// _tools/check-chat.js - AI 对话陪练：会话存档 / 句子收藏 / 句子进词书
+//
+// 要守的四件事（都是用户明确提的）：
+//   1. 首页有**原生**卡入口（不是靠 AI 指令造出来的卡）
+//   2. 对话能存下来（换一场、再回来还在；system 提示词不落盘）
+//   3. 聊出来的句子能收，收完和单词一样有界面（收藏页的「例句」档 + 例句详情）
+//   4. 收下来的句子能存进词书（整句作为那个词的例句一起进去）
+const fs = require('fs');
+const path = require('path');
+const { load, loadCode, ROOT } = require('./lib/load');
+
+let fail = 0;
+function ok(m) { console.log('  ✓ ' + m); }
+function bad(m) { fail++; console.error('  ✗ ' + m); }
+function eq(actual, expect, label) {
+  if (actual === expect) ok(label + ' = ' + expect);
+  else bad(label + ' 期望 ' + expect + '，实际 ' + actual);
+}
+function assert(cond, label) { if (cond) ok(label); else bad(label); }
+
+// ---------- 装载真实模块（照 check-search.js 的配方） ----------
+const mem = {};
+const CHAT_MEM = {};
+global.uni = {
+  getStorageSync: (k) => (k === 'fj_chat_v1' ? CHAT_MEM[k] : mem[k]),
+  setStorageSync: (k, v) => {
+    if (k === 'fj_chat_v1') CHAT_MEM[k] = v;
+    else mem[k] = v;
+  },
+  removeStorageSync: (k) => { delete mem[k]; delete CHAT_MEM[k]; },
+  showToast: () => {},
+  $emit: () => {},
+  navigateTo: () => {},
+  // 选词书用系统动作面板；测试里由断言指定选哪一本（见第 7 组）
+  showActionSheet: (o) => { if (o && o.fail) o.fail({}) }
+};
+
+const lemma = load('utils/lemma.js');
+const words = load('data/words.js');
+const sentences = load('data/sentences.js');
+const common = load('data/common-words.js');
+const wb = load('data/wordbooks.js', { WORDS: words.WORDS });
+const store = load('utils/store.js');
+const sentenceIndex = load('utils/sentence-index.js', {
+  SENTENCES: sentences.SENTENCES, WORDS: words.WORDS, lemmaCandidates: lemma.lemmaCandidates
+});
+const engine = load('utils/engine.js', {
+  WORDS: words.WORDS, SENTENCES: sentences.SENTENCES, store, sentenceIndex
+});
+const wordbook = load('utils/wordbook.js', {
+  store, WORDBOOKS: wb.WORDBOOKS, getBook: wb.getBook, wordIdsOfBook: wb.wordIdsOfBook,
+  setUserBookProvider: wb.setUserBookProvider,
+  WORDS: words.WORDS, streak: engine.streak, dateStr: engine.dateStr
+});
+const iplus1 = load('utils/iplus1.js', {
+  WORDS: words.WORDS, getBook: wb.getBook, wordbook, lemma: lemma.lemma
+});
+const aiCache = load('utils/ai-cache.js');
+const api = load('utils/sentence-api.js', {
+  featureOn: () => true, aiCache,
+  SENTENCES: sentences.SENTENCES, iplus1, store, sentenceIndex, lemma: lemma.lemma,
+  chatCompletion: () => Promise.reject(new Error('no ai in test'))
+});
+const dict = load('utils/dict.js', {
+  WORDS: words.WORDS, COMMON_RAW: common.COMMON_RAW, store,
+  lemmaCandidates: lemma.lemmaCandidates, lemma: lemma.lemma
+});
+const importer = load('utils/importer.js', {
+  WORDS: words.WORDS, WORDBOOKS: wb.WORDBOOKS, getBook: wb.getBook,
+  store, iplus1, generateBatch: api.generateBatch, dict
+});
+const search = load('utils/search.js', { wordbook, dict, importer });
+const settings = load('utils/settings.js', {});
+const tokenizeMod = load('utils/tokenize.js', {});
+const tokenize = (tokenizeMod && tokenizeMod.tokenize) || tokenizeMod;
+const chatStore = load('utils/chat-store.js', { settings });
+
+const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
+const homeSrc = read('pages/home/home.vue');
+const layoutSrc = read('utils/home-layout.ts');
+const schemaSrc = read('utils/page-schema.js');
+const widgetSrc = read('components/home-widgets/widget-chat.vue');
+const chatSrc = read('pkgManage/pages/chat/chat.vue');
+const favSrc = read('pkgStudy/pages/favorites/favorites.vue');
+const sdSrc = read('pkgStudy/pages/sentence-detail/sentence-detail.vue');
+
+console.log('== 1. 会话存档：能存、能续、能换 ==');
+const s0 = chatStore.active();
+assert(!!s0 && !!s0.id, '第一次进来自动开一条会话');
+eq(chatStore.activeId(), s0.id, '这条就是当前会话');
+// 画面上的消息含 system（每次按当前词书重新生成），落盘时必须被剔掉
+chatStore.saveMessages(s0.id, [
+  { role: 'system', content: '你是英语陪练' },
+  { role: 'user', content: 'I want to improve my English.' },
+  { role: 'assistant', content: '' },                 // 流式空气泡（还没收到字）
+  { role: 'assistant', content: '[object Object]' },   // 对象 String() 出来的垃圾
+  { role: 'assistant', content: 'Sure! What do you find hardest?' }
+]);
+const saved = chatStore.get(s0.id);
+eq(saved.messages.length, 2, '落盘 2 条（system / 空气泡 / 垃圾全剔掉）');
+eq(saved.messages[0].role, 'user', '第一条是用户发言');
+eq(saved.title, 'I want to improve my English.'.slice(0, 24), '标题取第一条用户发言（截断到 24 字）');
+
+const s1 = chatStore.create();
+assert(s1.id !== s0.id, '可以另开一场（id 不同）');
+chatStore.saveMessages(s1.id, [{ role: 'user', content: 'second chat' }]);
+eq(chatStore.sessions().length, 2, '两场会话都在');
+eq(chatStore.sessions()[0].id, s1.id, '最近聊过的排在最前');
+const back = chatStore.open(s0.id);
+eq(back.messages.length, 2, '切回老会话：内容原样还在（对话真的存住了）');
+chatStore.remove(s0.id);
+eq(chatStore.sessions().length, 1, '删掉一场只剩一场');
+eq(chatStore.activeId(), s1.id, '删掉的不是当前场时，当前场不受影响');
+
+console.log('== 2. 存档不被撑爆 ==');
+// 单会话只留最近 MAX_MSGS 条；会话条数也有上限
+const many = [];
+for (let i = 0; i < 260; i++) many.push({ role: 'user', content: 'line ' + i });
+chatStore.saveMessages(s1.id, many);
+eq(chatStore.get(s1.id).messages.length, chatStore.MAX_MSGS, '单会话消息数被夹到上限');
+eq(chatStore.get(s1.id).messages[0].content, 'line 60', '留的是最近的那些（老的先丢）');
+for (let i = 0; i < 30; i++) chatStore.create();
+assert(chatStore.sessions().length <= chatStore.MAX_SESSIONS, '会话条数不超上限：' + chatStore.sessions().length);
+chatStore.clearAll();
+eq(chatStore.sessions().length, 0, '清空后一条不剩');
+
+console.log('== 3. 收藏句子：去重、补译文、能取消 ==');
+const EN1 = 'Practice is the key to improving your English.';
+chatStore.clearAll();
+const r1 = chatStore.saveSentence(EN1, '练习是提高英语水平的关键。', { from: 'chat' });
+eq(r1.ok, true, '第一句收进去了');
+eq(chatStore.isSentenceSaved(EN1), true, '再问就是"已收藏"');
+eq(chatStore.savedCount(), 1, '收藏数 = 1');
+const r2 = chatStore.saveSentence(EN1, '', { from: 'chat' });
+eq(r2.dup, true, '同一句再收 = 重复（不会变成两条）');
+eq(chatStore.savedCount(), 1, '收藏数还是 1');
+// 同一句永远算出同一个 id：大小写 / 首尾空格不同也算同一句
+eq(chatStore.sentenceIdOf(EN1), chatStore.sentenceIdOf('  ' + EN1.toUpperCase() + ' '), 'id 稳定（去空格 + 忽略大小写）');
+const r3 = chatStore.saveSentence('   ', 'x', {});
+eq(r3.ok, false, '空白句收不进去');
+// 当时没配 AI → 译文是空的，之后再收同一句要把译文补上
+chatStore.clearAll();
+settings.reset ? settings.reset() : null;
+const favs = settings.favorites().slice();
+favs.forEach(f => settings.removeFavorite(f.type, f.id));
+chatStore.saveSentence(EN1, '', { from: 'chat' });
+eq(chatStore.savedCount(), 1, '没译文也先收下来');
+chatStore.saveSentence(EN1, '练习是关键。', { from: 'chat' });
+const refav = settings.favorites().filter(f => f.type === 'sentence')[0];
+eq(refav && refav.zh, '练习是关键。', '再收一次把译文补上了');
+chatStore.removeSentence(chatStore.sentenceIdOf(EN1));
+eq(chatStore.savedCount(), 0, '取消收藏生效');
+
+console.log('== 4. 首页原生卡入口 ==');
+// 卡必须是"原生"的：注册表里有、schema 认、首页有渲染分支，缺一处就是造不出来的卡
+assert(/\{\s*id:\s*'chat'[\s\S]{0,160}def:\s*true\s*\}/.test(layoutSrc), 'home-layout 注册了 chat 且默认上首页');
+assert(/BUILTIN_TYPES[\s\S]{0,200}?'chat'/.test(schemaSrc), 'page-schema 的 BUILTIN_TYPES 认这个类型');
+assert(/c\.type === 'chat'/.test(homeSrc), '首页有 chat 的渲染分支');
+assert(/import WidgetChat from/.test(homeSrc) && /WidgetChat,/.test(homeSrc), '首页注册了组件');
+assert(/<widget-chat\s*\/>/.test(homeSrc), '分支里真的渲染了这张卡');
+// 入口一律置灰、绝不 v-if 藏（藏起来用户会当成功能被删了）
+assert(/class="ch-main" :class="\{ 'entry-disabled': !aiOk \}"/.test(widgetSrc), '主按钮未配 AI 时置灰');
+assert(!/ch-main[^>]*v-if=/.test(widgetSrc), '主按钮没有用 v-if 藏起来');
+assert(/entry-disabled': !sessCount/.test(widgetSrc), '「历史对话」为空时也是置灰而不是消失');
+assert(/favorites\/favorites\?tab=sentence/.test(widgetSrc), '卡上有「我的句子」入口');
+
+console.log('== 5. 陪练页：能存对话、能收句子 ==');
+assert(/import \* as chatStore from/.test(chatSrc), '陪练页接了 chat-store');
+assert(/chatStore\.saveMessages\(/.test(chatSrc), '发完一句就落盘');
+assert(/onUnload\(\)[\s\S]{0,200}chatStore\.flush\(\)/.test(chatSrc), '关页面前强制落盘（800ms 合并窗口会丢最后一句）');
+assert(/onBackPress\(\)/.test(chatSrc), '历史面板开着时返回键先关面板');
+assert(/@tap="saveMsg\(m\)"/.test(chatSrc), '每条气泡都有收藏按钮');
+assert(/@longpress="saveMsg\(m\)"/.test(chatSrc), '长按气泡也能收藏');
+// system 提示词跟着当前词书走，存下来只会越来越旧 → 展示层必须剔掉
+assert(/filter\(m => m\.role === 'user' \|\| m\.role === 'assistant'\)/.test(chatSrc), 'system 提示词不显示在也不落盘');
+assert(/chatStore\.sessions\(\)/.test(chatSrc), '有历史会话列表');
+assert(/chatStore\.create\(\)/.test(chatSrc), '能开新对话');
+// AI 的回复要能刷到屏幕上：占位气泡必须拿「push 进数组之后」的响应式代理来改。
+// 用 push 前的裸对象改 → 不触发响应式 → viewMessages（计算属性，带缓存）不失效 →
+// 回复明明拿到了，界面却一直停在空气泡上，只有退出重进才看得到。真机踩过。
+assert(/const idx = this\.messages\.length/.test(chatSrc), '占位气泡：先记下标');
+assert(/const bubble = this\.messages\[idx\]/.test(chatSrc), '改的是数组里那个响应式对象（不是 push 前的裸对象）');
+assert(/void this\.streamTick/.test(chatSrc), 'viewMessages 依赖 streamTick（流式逐字也能失效重算）');
+assert(/onDelta:[\s\S]{0,300}bubble\.content \+=[\s\S]{0,160}bump\(\)/.test(chatSrc), 'onDelta 里改完内容就 bump()：收到字就把字刷上去');
+assert(((chatSrc.match(/bump\(\)/g) || []).length >= 3), '成功 / 失败 / 流式三处都 bump（不留下空气泡）');
+
+console.log('== 6. 句子界面：收藏页分档 + 例句详情 ==');
+assert(/\{ key: 'sentence', name: '例句' \}/.test(favSrc), '收藏页有「例句」这一档');
+assert(/opt\.tab === 'sentence'/.test(favSrc), '带 ?tab=sentence 进来直接落在例句档');
+assert(/f\.type === this\.tab/.test(favSrc), '按档过滤（不再和单词混在一起）');
+assert(/sentence-detail\?id=/.test(favSrc), '例句能点开进详情页（和单词一样的界面）');
+assert(/class="ac-title">\{\{ \$t\('加入词书'\)/.test(sdSrc), '例句详情有「加入词书」区');
+assert(/@tap="pickWord"/.test(sdSrc), '可以挑这句里的哪个词进词书');
+
+(async () => {
+  console.log('== 7. 句子真的能存进词书（真跑一遍） ==');
+  const sdScript = (/<script[^>]*>([\s\S]*?)<\/script>/.exec(sdSrc) || [])[1] || '';
+  const asked = [];
+  const sdPage = loadCode(sdScript, {
+    t: (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? String(v[k]) : m)),
+    settings, dict, wordbook, search, importer, tokenize,
+    // 假模型层：只记下"问了谁"，不联网
+    explainWord: async (w) => {
+      asked.push(String(w));
+      return { word: w, pos: 'n.', meaningZh: '（测试释义 ' + w + '）', kind: 'word' };
+    },
+    tts: { speakSentence: () => {}, speakWord: () => {}, stop: () => {} },
+    FloatNavbar: {}, AppDialog: {}
+  }, 'sentence-detail.vue').default;
+  assert(!!sdPage && typeof sdPage.data === 'function', '例句详情脚本可加载（导出 default）');
+
+  const vm = Object.assign({}, sdPage.data(), sdPage.methods, { en: '', zh: '', pick: '' });
+  const EN = 'Practice is the key to improving your English.';
+  vm.en = EN;
+  vm.zh = '练习是提高英语水平的关键。';
+
+  /* --- 候选词：虚词不能进候选 --- */
+  const cands = vm.candidates(EN);
+  assert(cands.indexOf('practice') >= 0, '实词进了候选：' + cands.join(','));
+  ['the', 'is', 'to', 'your', 'and'].forEach(w => {
+    assert(cands.indexOf(w) < 0, '虚词「' + w + '」不在候选里');
+  });
+  assert(cands.indexOf('improving') >= 0 && cands.indexOf('english') >= 0, '长词也在候选里');
+  eq(cands.length <= 12, true, '候选最多 12 个（不把整句都摊开）');
+
+  /* --- 真加入词书 --- */
+  const bid = wordbook.createUserBook('对话收句测试', '单测');
+  const list = wordbook.listBooks();
+  const at = list.map(b => b.name).indexOf('对话收句测试');
+  assert(at >= 0, '测试词书建好了');
+  // 走的是统一弹窗（不是系统动作面板）：addToBook 打开面板 → onDlgConfirm(下标) 收口
+  vm.pick = 'practice';
+  vm.addToBook();
+  assert(vm.dlg.show === true && vm.dlg.items.length === list.length, '弹出了词书选择面板');
+  assert(vm.dlg.items.some(it => /\（当前\）$/.test(it.label)), '当前那本标了「（当前）」');
+  await vm.onDlgConfirm(vm.dlg.items.map(it => it.label).indexOf('对话收句测试'));
+  const inBook = importer.customWordsOf(bid).filter(w => String(w.word).toLowerCase() === 'practice')[0];
+  assert(!!inBook, '这个词真的进了词书');
+  eq(inBook && inBook.exampleEn, EN, '整句作为例句一起存进去了（保存的句子进了词书）');
+  eq(inBook && inBook.exampleZh, vm.zh, '译文也一起进去了');
+  // 词典里有的词用词典释义（不浪费一次 AI 请求）；词典没有的才去问 AI
+  const dPractice = dict.lookup('practice');
+  eq(inBook && inBook.meaning, (dPractice && dPractice.found) ? dPractice.meaning : '（测试释义 practice）',
+    '释义来自词典（AI 只作兜底）');
+
+  /* --- 词已经在书里：不算错，把句子挂成例句 --- */
+  const pickBook = async (w) => {
+    vm.pick = w;
+    vm.addToBook();
+    await vm.onDlgConfirm(vm.dlg.items.map(it => it.label).indexOf('对话收句测试'));
+  };
+  await pickBook('english');
+  const second = importer.customWordsOf(bid).filter(w => String(w.word).toLowerCase() === 'english')[0];
+  assert(!!second && second.exampleEn === EN, '换一个词也能收');
+  await pickBook('english');       // 重复一次
+  const again = importer.customWordsOf(bid).filter(w => String(w.word).toLowerCase() === 'english')[0];
+  eq(again && again.exampleEn, EN, '重复收同一句不会报错，例句保持原样');
+
+  /* --- 没选词 / 没词书时不炸 --- */
+  vm.pick = '';
+  await vm.addToBook();
+  ok('没选词时点「加入词书」不炸（按钮是置灰的）');
+  wordbook.deleteUserBook(bid);
+
+  /* ============================================================
+   * 8. AI 的回复要真的刷到屏幕上（Vue 3 响应式）
+   * ------------------------------------------------------------
+   * 真机症状：发完一句话，界面一直转圈/停在空气泡上，退出页面再进来回复才出现。
+   * 根因：占位气泡是 push 前创建的裸对象，改它的 content 不会触发响应式，
+   *       而 viewMessages 是计算属性（结果带缓存），于是永远不重算。
+   * 下面用 Vue 3 的最小语义模拟（Proxy + 依赖收集 + 计算属性缓存）真跑一遍 send()，
+   * 只守这一件事：改了内容，界面上必须看得见。
+   * ============================================================ */
+  console.log('== 8. 回复能刷到屏幕上（响应式） ==');
+  const raw2px = new WeakMap();
+  const depMap = new WeakMap();
+  let activeEffect = null;
+  function track(t, k) {
+    if (!activeEffect) return;
+    let m = depMap.get(t);
+    if (!m) depMap.set(t, m = new Map());
+    let s = m.get(k);
+    if (!s) m.set(k, s = new Set());
+    s.add(activeEffect);
+  }
+  function trigger(t, k) {
+    const m = depMap.get(t);
+    if (!m) return;
+    const s = m.get(k);
+    if (!s) return;
+    s.forEach(e => { e.dirty = true });
+  }
+  function reactive(o) {
+    if (!o || typeof o !== 'object') return o;
+    if (raw2px.has(o)) return raw2px.get(o);
+    const p = new Proxy(o, {
+      get(t, k, r) {
+        const v = Reflect.get(t, k, r);
+        track(t, k);
+        return (v && typeof v === 'object') ? reactive(v) : v;
+      },
+      set(t, k, v, r) {
+        const old = Reflect.get(t, k, r);
+        const res = Reflect.set(t, k, v, r);
+        if (old !== v) trigger(t, k);
+        return res;
+      }
+    });
+    raw2px.set(o, p);
+    return p;
+  }
+  function makeComputed(vm, fn) {
+    const eff = { dirty: true, value: undefined };
+    return () => {
+      if (!eff.dirty) return eff.value;
+      const prev = activeEffect;
+      activeEffect = eff;
+      try { eff.value = fn.call(vm) } finally { activeEffect = prev }
+      eff.dirty = false;
+      return eff.value;
+    };
+  }
+
+  const tick = () => new Promise(r => setTimeout(r, 0));
+  const chatScript = (/<script[^>]*>([\s\S]*?)<\/script>/.exec(chatSrc) || [])[1] || '';
+  let fakeMode = 'stream';
+  let fakeReply = '';
+  const ChatPage = loadCode(chatScript, {
+    t: (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? String(v[k]) : m)),
+    isAIEnabled: () => true,
+    featureOn: () => true,
+    tutorSystemPrompt: () => 'SYS',
+    chatTutor: async (msgs, opts) => {
+      if (fakeMode === 'stream' && opts && opts.onDelta) {
+        await tick(); opts.onDelta('Sure! ');
+        await tick(); opts.onDelta('Let us practice.');
+      }
+      if (fakeMode === 'boom') throw new Error('down');
+      return { content: fakeReply };
+    },
+    explainWord: async () => ({ meaningZh: '（测试释义）' }),
+    wordbook,
+    chatStore,
+    tts: { speakSentence: () => {}, stop: () => {} },
+    FloatNavbar: {}
+  }, 'chat.vue').default;
+  assert(!!ChatPage && typeof ChatPage.data === 'function', '陪练页脚本可加载（导出 default）');
+
+  const lastOf = (arr) => arr[arr.length - 1];
+  const boot = (mode, reply) => {
+    fakeMode = mode; fakeReply = reply;
+    const raw = Object.assign({}, ChatPage.data(), ChatPage.methods, {
+      $nextTick: (fn) => { if (fn) fn() },
+      aiEnabled: true
+    });
+    const vm = reactive(raw);
+    // 盯住每一次"滚到底"：指令必须和上一次不同，值不变端上是不会滚的
+    const jumps = [];
+    const origScroll = raw.scrollToEnd;
+    raw.scrollToEnd = function (force) {
+      const before = raw.scrollTarget;
+      origScroll.call(vm, force);
+      jumps.push([before, raw.scrollTarget]);
+    };
+    vm.loadSession(chatStore.active());
+    return { vm, view: makeComputed(vm, ChatPage.computed.viewMessages), jumps };
+  };
+
+  /* --- 流式：第一个字到了就该看见，不用等整句 --- */
+  const a = boot('stream', 'Sure! Let us practice.');
+  a.vm.draft = 'hello';
+  const pending = a.vm.send();
+  await tick();
+  eq(lastOf(a.view()).content, 'Sure! ', '流式：第一个字到了屏幕上就有字（不是干等整句）');
+  eq(a.vm.thinking, false, '流式：收到字后"思考中"就收起来');
+  await pending;
+  eq(lastOf(a.view()).content, 'Sure! Let us practice.', '流式：整句收完气泡是完整回复');
+  // 计算属性确实是带缓存的 —— 正是这个缓存让"改裸对象"永远看不见
+  assert(a.view() === a.view(), 'viewMessages 有缓存（所以必须靠响应式/手动失效来刷新）');
+
+  /* --- 整块返回（端不支持流式，onDelta 一次都不调） --- */
+  const b = boot('block', '整块回复');
+  b.vm.draft = 'hi';
+  await b.vm.send();
+  eq(lastOf(b.view()).content, '整块回复', '不支持流式时：整块回复照样刷出来');
+  eq(b.vm.thinking, false, '整块：收完不再转圈');
+
+  /* --- 出错：气泡要给人话，不能留空气泡 --- */
+  const c = boot('boom', '');
+  c.vm.draft = 'hi';
+  await c.vm.send();
+  assert(/抱歉/.test(lastOf(c.view()).content), '出错时气泡给人话提示（不是空白）');
+  eq(c.vm.thinking, false, '出错也不再转圈');
+
+  /* ============================================================
+   * 9. 回复出来后要自动滚到底 + 键盘别收
+   * ------------------------------------------------------------
+   * 真机症状：发完一句话，AI 的回复在屏幕外面，得手动往下滑才看得到。
+   * 根因：scroll-into-view 只在**值变化**时滚动，写死 'msg-bottom' 连赋两次端上不动。
+   * 另外 input 挂了 :disabled="thinking" → 焦点被抢走 → 键盘收起，聊天断断续续。
+   * ============================================================ */
+  console.log('== 9. 自动滚到底 / 键盘不收 ==');
+  assert(/scrollToEnd\(/.test(chatSrc), '有 scrollToEnd()（统一收口"滚到最新一条"）');
+  assert(/this\.scrollTarget = this\.scrollTarget === 'mb-a' \? 'mb-b' : 'mb-a'/.test(chatSrc),
+    '两个锚点轮流指：每次都是真实变化（写死一个 id 端上不滚）');
+  assert(!/scrollTarget = 'msg-bottom'/.test(chatSrc), '没有写死单一锚点');
+  assert(/id="mb-a"/.test(chatSrc) && /id="mb-b"/.test(chatSrc), '底部两个锚点都在');
+  assert(/onDelta:[\s\S]{0,400}scrollToEnd\(\)/.test(chatSrc), '流式逐字时跟着往下滚');
+  assert(!/class="chat-input"[\s\S]{0,320}:disabled/.test(chatSrc),
+    '输入框不因"思考中"被禁用（一禁用焦点就丢、键盘收起）');
+  assert(/hold-keyboard="true"/.test(chatSrc), '点发送时键盘不收（hold-keyboard）');
+  assert(/this\.keepKeyboard\(\)/.test(chatSrc), '发完一句把焦点抢回来');
+  assert(/@blur="kbOn = false"/.test(chatSrc), '跟踪焦点状态（没丢就不做多余的抢焦）');
+
+  const d = boot('block', 'ok');
+  d.vm.draft = 'hi';
+  await d.vm.send();
+  assert(/^mb-[ab]$/.test(d.vm.scrollTarget), '发完消息给了滚到底的指令：' + d.vm.scrollTarget);
+  eq(d.vm.inputFocus, true, '发完消息焦点回到输入框（键盘不收）');
+  // 关键：每一次"滚到底"的指令都必须和上一次不同 —— 相同的值端上不会滚动
+  assert(d.jumps.length >= 2, '发一条消息至少滚两次（发出时 + 收完时）：' + d.jumps.length);
+  const stuck = d.jumps.filter(j => j[0] && j[0] === j[1]);
+  eq(stuck.length, 0, '没有哪次滚到底和上一次指同一个锚点（否则端上不滚，回复留在屏幕外）');
+  const used = {};
+  d.jumps.forEach(j => { if (j[1]) used[j[1]] = true });
+  assert(used['mb-a'] && used['mb-b'], '两个锚点都用上了：' + JSON.stringify(d.jumps));
+
+  console.log('');
+  console.log(fail === 0 ? '对话陪练 · 收藏句子 · 句子进词书 全部通过' : '失败 ' + fail + ' 项');
+  process.exit(fail ? 1 : 0);
+})();

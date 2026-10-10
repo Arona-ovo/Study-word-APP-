@@ -1,0 +1,124 @@
+/* 统计页 - 2×2 指标卡 + 渐变柱状图 + 四语义色分布条 */
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.metric {
+  width: 48.5%;
+  margin-bottom: 20rpx;
+  text-align: center;
+  padding: 36rpx 0;
+}
+
+.metric-num {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  color: #2e6bff;
+}
+
+.metric-label {
+  display: block;
+  font-size: 24rpx;
+  color: #5a6560;
+  margin-top: 10rpx;
+}
+
+.section {
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  margin-bottom: 32rpx;
+}
+
+/* 柱状图 */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  height: 280rpx;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.bar-wrap {
+  flex: 1;
+  width: 44rpx;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  background: linear-gradient(180deg, #4f8cff, #2e6bff);
+  border-radius: 10rpx 10rpx 0 0;
+  min-height: 6rpx;
+}
+
+.bar-empty {
+  background: #e9ede9;
+}
+
+.bar-num {
+  font-size: 20rpx;
+  color: #5a6560;
+  margin-top: 10rpx;
+  height: 28rpx;
+}
+
+.bar-label {
+  font-size: 20rpx;
+  color: #98a19b;
+}
+
+/* 分布 */
+.dist-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.dist-label {
+  width: 100rpx;
+  font-size: 26rpx;
+  color: #5a6560;
+  flex-shrink: 0;
+}
+
+.dist-track {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.dist-num {
+  width: 60rpx;
+  text-align: right;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #17201a;
+  flex-shrink: 0;
+}
+
+.progress-fill.familiar { background: #7c3aed; }
+.progress-fill.learning { background: #f79009; }
+.progress-fill.neww { background: #c7cfc9; }
+
+.reset {
+  text-align: center;
+  font-size: 26rpx;
+  color: #98a19b;
+  padding: 32rpx 0 64rpx;
+}

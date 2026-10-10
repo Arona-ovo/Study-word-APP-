@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/cover/cover",
+    "pages/home/home",
+    "pages/practice/practice",
+    "pages/review/review",
+    "pages/vocab/vocab",
+    "pages/stats/stats"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#2e6bff",
+    "navigationBarTitleText": "专升本英语翻译",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f4f6f4"
+  },
+  "tabBar": {
+    "color": "#98a19b",
+    "selectedColor": "#2e6bff",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "首页" },
+      { "pagePath": "pages/review/review", "text": "错题" },
+      { "pagePath": "pages/vocab/vocab", "text": "词汇" },
+      { "pagePath": "pages/stats/stats", "text": "统计" }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

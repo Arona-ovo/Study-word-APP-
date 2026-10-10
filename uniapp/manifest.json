@@ -1,0 +1,65 @@
+{
+    "name" : "AWword",
+    "appid" : "__UNI__53285BF",
+    "description" : "英语单词与翻译练习：词书分批学习、中英互译、按掌握情况调整难度",
+    "versionName" : "1.0 Beta",
+    "versionCode" : "101",
+    "vueVersion" : "3",
+    "transformPx" : false,
+    "app-plus" : {
+        "darkmode" : true,
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "compatible" : {
+            "ignoreVersion" : true
+        },
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : false,
+            "waiting" : false,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        "modules" : {
+            "SQLite" : {
+                "description" : "本地账号与学习记录（users / study_records / word_favorite）"
+            }
+        },
+        "distribute" : {
+            "android" : {
+                "permissions" : [ "<uses-permission android:name=\"android.permission.INTERNET\"/>" ]
+            },
+            "ios" : {
+                "dSYMs" : false
+            },
+            "sdkConfigs" : {},
+            "icons" : {
+                "android" : {
+                    "mdpi" : "static/icons/icon-48.png",
+                    "hdpi" : "static/icons/icon-72.png",
+                    "xhdpi" : "static/icons/icon-96.png",
+                    "xxhdpi" : "static/icons/icon-144.png",
+                    "xxxhdpi" : "static/icons/icon-192.png"
+                }
+            },
+            "splashscreen" : {
+                "androidStyle" : "default",
+                "android" : {
+                    "hdpi" : "static/splash/splash-hdpi.png",
+                    "xhdpi" : "static/splash/splash-xhdpi.png",
+                    "xxhdpi" : "static/splash/splash-xxhdpi.png"
+                }
+            }
+        }
+    },
+    "mp-weixin" : {
+        "appid" : "touristappid",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : true
+        },
+        "usingComponents" : true,
+        "lazyCodeLoading" : "requiredComponents"
+    },
+    "locale" : "zh-Hans"
+}

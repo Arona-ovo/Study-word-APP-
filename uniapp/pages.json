@@ -1,0 +1,166 @@
+{
+  "pages": [
+    {
+      "path": "pages/cover/cover",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/home/home",
+      "style": { "navigationBarTitleText": "背单词", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/review/review",
+      "style": { "navigationBarTitleText": "错题回顾", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/library/library",
+      "style": { "navigationBarTitleText": "词库", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": { "navigationBarTitleText": "我的", "navigationStyle": "custom" }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "pkgStudy",
+      "name": "pkgStudy",
+      "pages": [
+        {
+          "path": "pages/practice/practice",
+          "style": { "navigationBarTitleText": "翻译练习", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/word-drill/word-drill",
+          "style": { "navigationBarTitleText": "刷单词", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/favorites/favorites",
+          "style": { "navigationBarTitleText": "我的收藏", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/sentence-detail/sentence-detail",
+          "style": { "navigationBarTitleText": "例句详情", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/stats/stats",
+          "style": { "navigationBarTitleText": "学习统计", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/history/history",
+          "style": { "navigationBarTitleText": "练习历史", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/review-list/review-list",
+          "style": { "navigationBarTitleText": "待复习", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/streak/streak",
+          "style": { "navigationBarTitleText": "连续打卡", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/wrong-detail/wrong-detail",
+          "style": { "navigationBarTitleText": "错题详情", "navigationStyle": "custom" }
+        }
+      ]
+    },
+    {
+      "root": "pkgManage",
+      "name": "pkgManage",
+      "pages": [
+        {
+          "path": "pages/library-detail/library-detail",
+          "style": { "navigationBarTitleText": "词库详情", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/book-switch/book-switch",
+          "style": { "navigationBarTitleText": "更换词书", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/settings/settings",
+          "style": { "navigationBarTitleText": "设置", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/chat/chat",
+          "style": { "navigationBarTitleText": "AI 对话陪练", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/login/login",
+          "style": { "navigationBarTitleText": "登录", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/word-detail/word-detail",
+          "style": { "navigationBarTitleText": "单词详情", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/known-filter/known-filter",
+          "style": { "navigationBarTitleText": "熟词过滤", "navigationStyle": "custom" }
+        },
+        {
+          "path": "pages/donate/donate",
+          "style": { "navigationBarTitleText": "支持 AWword", "navigationStyle": "custom" }
+        }
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/home/home": {
+      "network": "all",
+      "packages": ["pkgStudy"]
+    }
+  },
+  "globalStyle": {
+    "navigationBarBackgroundColor": "#E4E9E4",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "背单词",
+    "backgroundColor": "#e4e9e4",
+    "app-plus": {
+      "titleNView": {
+        "backgroundColor": "#E4E9E4",
+        "titleColor": "#17201A",
+        "splitLine": { "color": "#E4E9E4", "height": "1px" }
+      }
+    }
+  },
+  "tabBar": {
+    "color": "#98a19b",
+    "selectedColor": "#2e6bff",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/library/library",
+        "text": "词库",
+        "iconPath": "static/tabbar/library.png",
+        "selectedIconPath": "static/tabbar/library-active.png"
+      },
+      {
+        "pagePath": "pages/review/review",
+        "text": "错题",
+        "iconPath": "static/tabbar/wrong.png",
+        "selectedIconPath": "static/tabbar/wrong-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "static/tabbar/profile.png",
+        "selectedIconPath": "static/tabbar/profile-active.png"
+      }
+    ]
+  },
+	"condition" : { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}

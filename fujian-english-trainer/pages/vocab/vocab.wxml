@@ -1,0 +1,52 @@
+<view class="container">
+  <!-- 掌握度总览 -->
+  <view class="card overview-card">
+    <view class="ov-item">
+      <text class="ov-num">{{counts.mastered}}</text>
+      <text class="ov-label">已掌握</text>
+    </view>
+    <view class="ov-item">
+      <text class="ov-num">{{counts.familiar}}</text>
+      <text class="ov-label">熟悉</text>
+    </view>
+    <view class="ov-item">
+      <text class="ov-num">{{counts.learning}}</text>
+      <text class="ov-label">学习中</text>
+    </view>
+    <view class="ov-item">
+      <text class="ov-num">{{counts.new}}</text>
+      <text class="ov-label">新词</text>
+    </view>
+  </view>
+
+  <!-- 筛选 -->
+  <scroll-view scroll-x class="filter-bar" enhanced show-scrollbar="{{false}}">
+    <view
+      wx:for="{{filters}}"
+      wx:key="key"
+      class="filter-item {{filter === item.key ? 'active' : ''}}"
+      data-k="{{item.key}}"
+      bindtap="setFilter"
+    >{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 词汇列表 -->
+  <view wx:if="{{list.length === 0}}" class="empty">该分类下暂无词汇</view>
+  <view wx:for="{{list}}" wx:key="id" class="card word-item">
+    <view class="word-head">
+      <view class="word-main">
+        <text class="word-text">{{item.w}}</text>
+        <text class="word-pos">{{item.pos}}</text>
+      </view>
+      <text class="tag lv-tag">Lv{{item.lv}}</text>
+      <text class="tag status-tag s-{{item.status}}">{{item.statusName}}</text>
+    </view>
+    <view class="word-mean">{{item.m}}</view>
+    <view class="word-foot">
+      <view class="progress-track word-track">
+        <view class="progress-fill" style="width:{{item.pct}}%"></view>
+      </view>
+      <text class="word-times">{{item.seen ? '练' + item.seen + '次 · 对' + item.correct + '次' : '尚未练习'}}</text>
+    </view>
+  </view>
+</view>

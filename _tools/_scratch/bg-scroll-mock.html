@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>背景层滚动验证</title>
+<style>
+  /* 与 uniapp/App.vue 的背景层等价还原 */
+  html, body { margin: 0; background: #f4f6f4; background-attachment: fixed; }
+  .page { background: #f4f6f4; background-attachment: fixed; min-height: 100vh; }
+
+  .app-root { position: relative; z-index: 0; }
+
+  .app-root::before,
+  .app-root::after {
+    content: '';
+    position: fixed;
+    left: 0; right: 0; top: 0; bottom: 0;
+    z-index: -2;
+    pointer-events: none;
+  }
+  .app-root::before {
+    background-color: var(--bg-color, transparent);
+    background-image: var(--bg-img, none);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+  .app-root::after {
+    z-index: -1;
+    background: var(--bg-mask, transparent);
+    -webkit-backdrop-filter: blur(var(--bg-blur, 0px));
+    backdrop-filter: blur(var(--bg-blur, 0px));
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin: 18px;
+    border: 1px solid rgba(23, 32, 26, 0.08);
+    box-shadow: 0 6px 18px rgba(23, 32, 26, 0.1);
+    font: 15px/1.6 -apple-system, "PingFang SC", sans-serif;
+  }
+  .spacer { height: 420px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- theme.rootStyle() 生成的 inline style 等价物 -->
+  <div class="app-root" id="root" style="
+    background-attachment: fixed;
+    --bg-color: #f4f6f4;
+    --bg-img: repeating-linear-gradient(180deg, #f4f6f4 0px, #f4f6f4 40px, #cfe0ff 40px, #cfe0ff 80px);
+    --bg-mask: rgba(255, 255, 255, 0.35);
+    --bg-blur: 8px;
+    background-color: #f4f6f4;
+    background-image: repeating-linear-gradient(180deg, #f4f6f4 0px, #f4f6f4 40px, #cfe0ff 40px, #cfe0ff 80px);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  ">
+    <div class="card">① 第一张卡片 —— 用于观察毛玻璃是否仍半透明、背景是否被淡化与模糊</div>
+    <div class="spacer"></div>
+    <div class="card">② 第二张卡片</div>
+    <div class="spacer"></div>
+    <div class="card">③ 第三张卡片</div>
+    <div class="spacer"></div>
+    <div class="card">④ 第四张卡片（滚动条已到底附近）</div>
+    <div class="spacer"></div>
+  </div>
+</div>
+<script>
+  // 供自动化断言用：标记背景层的位置，滚动后应完全不动
+  window.__probe = () => {
+    const r = document.getElementById('root');
+    const cs = getComputedStyle(r, '::before');
+    return { attachment: cs.backgroundAttachment, position: cs.position, top: cs.top, img: cs.backgroundImage.slice(0, 40) };
+  };
+</script>
+</body>
+</html>

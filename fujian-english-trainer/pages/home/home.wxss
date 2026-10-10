@@ -1,0 +1,152 @@
+/* 首页 - 品牌 Hero + 今日主动作 + 三宫格入口 */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #4f8cff, #1d4fd8);
+  border-radius: 28rpx;
+  padding: 44rpx 36rpx;
+  color: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(46, 107, 255, 0.28);
+}
+
+/* 装饰圆斑，增加层次 */
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 260rpx;
+  height: 260rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  right: -80rpx;
+  top: -100rpx;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  right: 60rpx;
+  bottom: -70rpx;
+}
+
+.hero-mascot {
+  position: absolute;
+  right: 32rpx;
+  top: 40rpx;
+  width: 132rpx;
+  height: 132rpx;
+  border-radius: 50%;
+  border: 6rpx solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6rpx 20rpx rgba(13, 40, 120, 0.25);
+  z-index: 2;
+}
+
+.hero-title {
+  position: relative;
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  max-width: 480rpx;
+}
+
+.hero-sub {
+  position: relative;
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
+  opacity: 0.8;
+  margin-top: 12rpx;
+}
+
+.hero-stats {
+  position: relative;
+  display: flex;
+  margin-top: 44rpx;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20rpx;
+  padding: 28rpx 0;
+}
+
+.hs-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hs-num {
+  font-size: 44rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.hs-label {
+  font-size: 22rpx;
+  opacity: 0.85;
+  margin-top: 6rpx;
+}
+
+/* 今日练习卡 */
+.today-card {
+  margin-top: 24rpx;
+}
+
+.today-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 22rpx;
+}
+
+.today-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.today-info {
+  font-size: 24rpx;
+  color: #5a6560;
+}
+
+.start-btn {
+  margin-top: 32rpx;
+}
+
+.today-tip {
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: #98a19b;
+  text-align: center;
+}
+
+/* 三宫格入口 */
+.grid {
+  display: flex;
+  margin-top: 24rpx;
+  justify-content: space-between;
+}
+
+.grid-item {
+  width: 31.5%;
+  text-align: center;
+  padding: 36rpx 0;
+}
+
+.grid-num {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #2e6bff;
+}
+
+.grid-num.warn {
+  color: #f79009;
+}
+
+.grid-label {
+  font-size: 24rpx;
+  color: #5a6560;
+  margin-top: 8rpx;
+}

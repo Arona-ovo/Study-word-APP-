@@ -1,0 +1,129 @@
+<view class="container" wx:if="{{!empty}}">
+  <!-- 答题流程 -->
+  <block wx:if="{{!finished}}">
+    <view class="topbar">
+      <text class="progress-text">{{idx + 1}} / {{questions.length}}</text>
+      <view class="progress-track topbar-track">
+        <view class="progress-fill" style="width:{{(idx + 1) / questions.length * 100}}%"></view>
+      </view>
+    </view>
+
+    <!-- 题干（英文题干支持点读） -->
+    <view class="card q-card">
+      <view class="q-meta">
+        <text class="tag dir-tag">{{q.dir === 'e2c' ? '英译汉' : '汉译英'}}</text>
+        <text class="tag lv-tag">难度 Lv{{q.lv}}</text>
+        <text class="tag src-tag" wx:if="{{source === 'review'}}">错题重练</text>
+        <view class="replay-btn" data-text="{{q.prompt}}" bindtap="replay">重听</view>
+      </view>
+      <view class="prompt" wx:if="{{promptIsEn}}">
+        <text
+          wx:for="{{promptTokens}}"
+          wx:key="index"
+          class="{{item.w ? 'tok' : 'pun'}}"
+          data-w="{{item.t}}"
+          data-isw="{{item.w}}"
+          bindtap="tapWord"
+        >{{item.t}}</text>
+      </view>
+      <view class="prompt" wx:else>{{q.prompt}}</view>
+      <view class="prompt-tip" wx:if="{{promptIsEn}}">点击单词可查看词义并听发音</view>
+    </view>
+
+    <!-- 作答方式切换 -->
+    <view class="mode-switch {{answered ? 'locked' : ''}}">
+      <view class="mode-item {{mode === 'choice' ? 'active' : ''}}" data-m="choice" bindtap="switchMode">选择题</view>
+      <view class="mode-item {{mode === 'input' ? 'active' : ''}}" data-m="input" bindtap="switchMode">手动输入</view>
+    </view>
+
+    <!-- 选择题模式 -->
+    <view class="options" wx:if="{{mode === 'choice'}}">
+      <view
+        wx:for="{{options}}"
+        wx:key="index"
+        class="option {{answered && index === q.answerIndex ? 'correct' : ''}} {{answered && selected === index && index !== q.answerIndex ? 'wrong' : ''}}"
+        data-i="{{index}}"
+        bindtap="choose"
+        hover-class="option-hover"
+      >
+        <text class="option-label">{{labels[index]}}</text>
+        <text class="option-text">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 手动输入模式 -->
+    <view class="card input-card" wx:else>
+      <textarea
+        class="answer-input"
+        placeholder="请输入你的完整翻译..."
+        value="{{input}}"
+        bindinput="onInput"
+        disabled="{{answered}}"
+        auto-height
+        maxlength="300"
+      />
+      <button wx:if="{{!answered}}" class="btn-primary submit-btn" bindtap="submitInput" disabled="{{!canSubmit}}">提交答案</button>
+    </view>
+
+    <!-- 结果与解析 -->
+    <view wx:if="{{answered}}" class="card result-card">
+      <view class="result-title {{result.pass ? 'ok' : (result.partial ? 'mid' : 'bad')}}">
+        {{result.pass ? '回答正确' : (result.partial ? '基本正确，继续打磨' : '回答有误')}}
+        <text class="result-score" wx:if="{{mode === 'input'}}">匹配度 {{result.score}}%</text>
+      </view>
+      <view class="result-row" wx:if="{{mode === 'input'}}">
+        <text class="result-label">你的答案</text>
+        <text class="result-value">{{userAnswer}}</text>
+      </view>
+      <view class="result-row">
+        <view class="result-label-row">
+          <text class="result-label">参考答案</text>
+          <view class="replay-btn small" data-text="{{q.answer}}" bindtap="replay">重听</view>
+        </view>
+        <view class="result-value ref" wx:if="{{answerIsEn}}">
+          <text
+            wx:for="{{answerTokens}}"
+            wx:key="index"
+            class="{{item.w ? 'tok' : 'pun'}}"
+            data-w="{{item.t}}"
+            data-isw="{{item.w}}"
+            bindtap="tapWord"
+          >{{item.t}}</text>
+        </view>
+        <text class="result-value ref" wx:else>{{q.answer}}</text>
+      </view>
+      <view class="note" wx:if="{{q.note}}">解析：{{q.note}}</view>
+      <view class="word-chips">
+        <view class="chip" wx:for="{{q.words}}" wx:key="id" data-text="{{item.w}}" bindtap="replay">{{item.w}} {{item.pos}}{{item.m}}</view>
+      </view>
+      <button class="btn-primary next-btn" bindtap="next">{{idx + 1 === questions.length ? '查看结果' : '下一题'}}</button>
+    </view>
+  </block>
+
+  <!-- 本组总结 -->
+  <view wx:else class="summary">
+    <view class="card summary-card">
+      <view class="summary-title">本组练习完成</view>
+      <view class="summary-score">{{correctCount}}<text class="summary-total"> / {{questions.length}}</text></view>
+      <view class="summary-sub">正确率 {{accuracy}}% · 掌握度已更新</view>
+      <button class="btn-primary summary-btn" bindtap="restart">再练一组</button>
+      <button class="btn-ghost summary-btn" bindtap="goHome">返回首页</button>
+    </view>
+  </view>
+
+  <!-- 点读单词弹窗 -->
+  <view class="pop-mask" wx:if="{{pop.show}}" bindtap="closePop">
+    <view class="pop-card" catchtap="noop">
+      <view class="pop-word">{{pop.word}}</view>
+      <view class="pop-meaning" wx:if="{{pop.pos}}">{{pop.pos}} {{pop.meaning}}</view>
+      <view class="pop-meaning none" wx:else>考纲外词汇</view>
+      <view class="pop-replay" data-text="{{pop.word}}" bindtap="replay">再听一次</view>
+    </view>
+  </view>
+</view>
+
+<!-- 空状态 -->
+<view wx:else class="empty">
+  <view class="empty-text">{{emptyText}}</view>
+  <button class="btn-primary empty-btn" bindtap="goHome">返回首页</button>
+</view>

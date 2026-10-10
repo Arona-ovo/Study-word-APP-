@@ -1,0 +1,51 @@
+<view class="container">
+  <!-- 顶部概览 -->
+  <view class="hero">
+    <image class="hero-mascot" src="/assets/mascot.jpg" mode="aspectFill" />
+    <view class="hero-title">福建专升本 · 英语翻译训练</view>
+    <view class="hero-sub">考纲词汇 / 中英互译 / 自适应难度</view>
+    <view class="hero-stats">
+      <view class="hs-item">
+        <text class="hs-num">Lv{{level}}</text>
+        <text class="hs-label">{{levelName}}阶段</text>
+      </view>
+      <view class="hs-item">
+        <text class="hs-num">{{streak}}</text>
+        <text class="hs-label">连续学习(天)</text>
+      </view>
+      <view class="hs-item">
+        <text class="hs-num">{{mastered}}/{{total}}</text>
+        <text class="hs-label">已掌握词汇</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日练习 -->
+  <view class="card today-card">
+    <view class="today-head">
+      <text class="today-title">每日练习</text>
+      <text class="today-info">今日已练 {{today.total}} 题 · 正确 {{today.correct}} 题</text>
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width:{{todayPct}}%"></view>
+    </view>
+    <button class="btn-primary start-btn" bindtap="startPractice">{{today.total > 0 ? '继续练习' : '开始今日练习'}}</button>
+    <view class="today-tip">系统会根据你的掌握情况自动调整题目难度与新词比例</view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="grid">
+    <view class="grid-item card" data-url="/pages/review/review" bindtap="goTab">
+      <view class="grid-num warn">{{wrongCount}}</view>
+      <view class="grid-label">错题回顾</view>
+    </view>
+    <view class="grid-item card" data-url="/pages/vocab/vocab" bindtap="goTab">
+      <view class="grid-num">{{mastered}}</view>
+      <view class="grid-label">词汇掌握</view>
+    </view>
+    <view class="grid-item card" data-url="/pages/stats/stats" bindtap="goTab">
+      <view class="grid-num">Lv{{level}}</view>
+      <view class="grid-label">学习统计</view>
+    </view>
+  </view>
+</view>

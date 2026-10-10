@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.example.dancibei">
+
+    <!-- Android 11(targetSdk>=30) 起：与系统 TTS 引擎交互必须声明包可见性，
+         否则 TextToSpeech 绑定不到 com.google.android.tts，onInit 返回 ERROR。
+         注意：云端打包才会合并本文件，标准基座真机运行不生效。
+         package 为占位值，云端打包时以 HBuilderX 里配置的 Android 包名为准。 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
+    <application>
+        <!-- 不要重复 manifest.json 已配置的内容，避免合并冲突 -->
+    </application>
+
+</manifest>

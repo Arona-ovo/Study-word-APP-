@@ -1,0 +1,70 @@
+<view class="container">
+  <!-- 核心指标 -->
+  <view class="metrics">
+    <view class="card metric">
+      <text class="metric-num">{{total}}</text>
+      <text class="metric-label">累计答题</text>
+    </view>
+    <view class="card metric">
+      <text class="metric-num">{{accuracy}}%</text>
+      <text class="metric-label">总正确率</text>
+    </view>
+    <view class="card metric">
+      <text class="metric-num">{{streak}}</text>
+      <text class="metric-label">连续学习(天)</text>
+    </view>
+    <view class="card metric">
+      <text class="metric-num">Lv{{level}}</text>
+      <text class="metric-label">{{levelName}}阶段</text>
+    </view>
+  </view>
+
+  <!-- 近 7 天练习量 -->
+  <view class="card section">
+    <view class="section-title">近 7 天练习量</view>
+    <view class="chart">
+      <view wx:for="{{days}}" wx:key="label" class="bar-col">
+        <view class="bar-wrap">
+          <view class="bar {{item.total > 0 ? '' : 'bar-empty'}}" style="height:{{item.h}}%"></view>
+        </view>
+        <text class="bar-num">{{item.total || ''}}</text>
+        <text class="bar-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 词汇掌握分布 -->
+  <view class="card section">
+    <view class="section-title">词汇掌握分布（共 {{wordTotal}} 词）</view>
+    <view class="dist-row">
+      <text class="dist-label">已掌握</text>
+      <view class="progress-track dist-track">
+        <view class="progress-fill" style="width:{{counts.mastered / wordTotal * 100}}%"></view>
+      </view>
+      <text class="dist-num">{{counts.mastered}}</text>
+    </view>
+    <view class="dist-row">
+      <text class="dist-label">熟悉</text>
+      <view class="progress-track dist-track">
+        <view class="progress-fill familiar" style="width:{{counts.familiar / wordTotal * 100}}%"></view>
+      </view>
+      <text class="dist-num">{{counts.familiar}}</text>
+    </view>
+    <view class="dist-row">
+      <text class="dist-label">学习中</text>
+      <view class="progress-track dist-track">
+        <view class="progress-fill learning" style="width:{{counts.learning / wordTotal * 100}}%"></view>
+      </view>
+      <text class="dist-num">{{counts.learning}}</text>
+    </view>
+    <view class="dist-row">
+      <text class="dist-label">新词</text>
+      <view class="progress-track dist-track">
+        <view class="progress-fill neww" style="width:{{counts.new / wordTotal * 100}}%"></view>
+      </view>
+      <text class="dist-num">{{counts.new}}</text>
+    </view>
+  </view>
+
+  <view class="reset" bindtap="resetData">重置学习数据</view>
+</view>

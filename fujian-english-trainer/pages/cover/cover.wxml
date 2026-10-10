@@ -1,0 +1,26 @@
+<view class="cover" bindtap="enter">
+  <view class="deco deco-1"></view>
+  <view class="deco deco-2"></view>
+  <view class="deco deco-3"></view>
+
+  <!-- 看板娘：浮动 + 呼吸光环 -->
+  <view class="stage">
+    <view class="ring"></view>
+    <view class="mascot-wrap">
+      <image class="mascot" src="/assets/mascot.jpg" mode="aspectFill" />
+    </view>
+  </view>
+
+  <!-- 品牌区：分幕入场 -->
+  <view class="brand">
+    <view class="app-name anim" style="animation-delay:.25s">ENGLISH TRAINER</view>
+    <view class="divider anim" style="animation-delay:.55s"></view>
+    <view class="app-en anim" style="animation-delay:.75s">FUJIAN · TRANSLATION PRACTICE</view>
+  </view>
+
+  <!-- 底部：自动进入进度条 -->
+  <view class="footer anim" style="animation-delay:1s">
+    <view class="load-track"><view class="load-fill"></view></view>
+    <view class="hint">TAP TO START</view>
+  </view>
+</view>

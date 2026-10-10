@@ -1,0 +1,119 @@
+/* 词汇页 - 四状态语义色 + 掌握度细进度条 */
+
+.overview-card {
+  display: flex;
+  padding: 32rpx 0;
+  margin-bottom: 24rpx;
+}
+
+.ov-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ov-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #2e6bff;
+}
+
+.ov-item:nth-child(2) .ov-num { color: #7c3aed; }
+.ov-item:nth-child(3) .ov-num { color: #f79009; }
+.ov-item:nth-child(4) .ov-num { color: #98a19b; }
+
+.ov-label {
+  font-size: 22rpx;
+  color: #5a6560;
+  margin-top: 6rpx;
+}
+
+.filter-bar {
+  white-space: nowrap;
+  margin-bottom: 24rpx;
+}
+
+.filter-item {
+  display: inline-block;
+  padding: 14rpx 36rpx;
+  margin-right: 16rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: #5a6560;
+  box-shadow: 0 2rpx 8rpx rgba(23, 32, 26, 0.04);
+}
+
+.filter-item.active {
+  background: #2e6bff;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.empty {
+  text-align: center;
+  color: #98a19b;
+  padding: 120rpx 0;
+  font-size: 28rpx;
+}
+
+.word-item {
+  margin-bottom: 18rpx;
+}
+
+.word-head {
+  display: flex;
+  align-items: center;
+}
+
+.word-main {
+  flex: 1;
+}
+
+.word-text {
+  font-size: 36rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  color: #17201a;
+  font-family: Georgia, "Times New Roman", "PingFang SC", serif;
+}
+
+.word-pos {
+  font-size: 24rpx;
+  color: #98a19b;
+  margin-left: 12rpx;
+}
+
+.lv-tag {
+  background: #eef1ee;
+  color: #5a6560;
+  margin-right: 10rpx;
+}
+
+.status-tag.s-mastered { background: #ebf1ff; color: #1d4fd8; font-weight: 600; }
+.status-tag.s-familiar { background: #f1ecff; color: #7c3aed; font-weight: 600; }
+.status-tag.s-learning { background: #fef3e0; color: #b54708; font-weight: 600; }
+.status-tag.s-new { background: #eef1ee; color: #5a6560; }
+
+.word-mean {
+  font-size: 28rpx;
+  color: #5a6560;
+  margin: 12rpx 0 18rpx;
+}
+
+.word-foot {
+  display: flex;
+  align-items: center;
+}
+
+.word-track {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.word-times {
+  font-size: 22rpx;
+  color: #98a19b;
+  flex-shrink: 0;
+}

@@ -1,0 +1,95 @@
+/* 错题页 - 红绿对照，顶部主动作 */
+
+.head-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.head-text {
+  font-size: 26rpx;
+  color: #5a6560;
+  flex: 1;
+  margin-right: 20rpx;
+  line-height: 1.5;
+}
+
+.head-btn {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  padding: 0 36rpx;
+  height: 76rpx;
+}
+
+.empty {
+  padding: 200rpx 0;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #5a6560;
+}
+
+.empty-sub {
+  font-size: 26rpx;
+  color: #98a19b;
+  margin-top: 14rpx;
+}
+
+.wrong-item {
+  margin-bottom: 20rpx;
+}
+
+.wrong-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.dir-tag {
+  background: #ebf1ff;
+  color: #1d4fd8;
+  font-weight: 600;
+}
+
+.wrong-time {
+  font-size: 22rpx;
+  color: #98a19b;
+}
+
+.wrong-prompt {
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+  color: #17201a;
+}
+
+.wrong-answer-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12rpx;
+}
+
+.wrong-label {
+  font-size: 22rpx;
+  color: #98a19b;
+  margin-bottom: 4rpx;
+}
+
+.wrong-user {
+  font-size: 28rpx;
+  color: #e5484d;
+  line-height: 1.55;
+}
+
+.wrong-ref {
+  font-size: 28rpx;
+  color: #1d4fd8;
+  font-weight: 600;
+  line-height: 1.55;
+}

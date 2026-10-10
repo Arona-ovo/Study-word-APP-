@@ -1,0 +1,88 @@
+/* app.wxss - 全局样式（设计令牌见 DESIGN.md · 简约高级） */
+page {
+  background: #f4f6f4;
+  color: #17201a;
+  font-size: 28rpx;
+  line-height: 1.6;
+  letter-spacing: 0.5rpx;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+}
+
+.container {
+  padding: 32rpx 28rpx;
+  box-sizing: border-box;
+}
+
+/* 卡片：发丝边框 + 极浅投影，扁平克制 */
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 40rpx 36rpx;
+  border: 2rpx solid #eff2f5;
+  box-shadow: 0 2rpx 8rpx rgba(23, 32, 26, 0.03);
+  box-sizing: border-box;
+}
+
+/* 主按钮：细字重 + 宽字距（text-indent 补偿字距，保证视觉居中） */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #2e6bff;
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  letter-spacing: 2rpx;
+  text-indent: 2rpx;
+  height: 96rpx;
+}
+.btn-primary::after { border: none; }
+.btn-primary[disabled] {
+  background: #a9c3ff;
+  color: #ffffff;
+}
+
+/* 幽灵按钮：次级动作 */
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #ffffff;
+  color: #1d4fd8;
+  border: 2rpx solid #2e6bff;
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  letter-spacing: 2rpx;
+  text-indent: 2rpx;
+  height: 96rpx;
+}
+.btn-ghost::after { border: none; }
+
+/* 标签 */
+.tag {
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  text-indent: 1rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* 进度条 */
+.progress-track {
+  height: 12rpx;
+  background: #edf0f2;
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f8cff, #2e6bff);
+  border-radius: 999rpx;
+  transition: width 0.3s ease;
+}

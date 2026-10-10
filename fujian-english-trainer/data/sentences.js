@@ -1,0 +1,60 @@
+// data/sentences.js - 翻译练习句库（中英互译）
+// lv 与词汇等级对应；w 为本句考查的核心词汇 id；note 为解析/考点句型
+const SENTENCES = [
+  // ---------- Lv1 入门 ----------
+  { id: 1,  lv: 1, en: 'Practice is the key to improving your English.', zh: '练习是提高英语水平的关键。', w: [4, 1], note: 'the key to (doing) sth. 做某事的关键，to 为介词' },
+  { id: 2,  lv: 1, en: 'Good habits are very important for success.', zh: '好习惯对成功非常重要。', w: [2, 5, 11], note: 'be important for 对……重要' },
+  { id: 3,  lv: 1, en: 'It is difficult to make progress without practice.', zh: '不练习就很难取得进步。', w: [6, 12, 4], note: 'It is + adj. + to do sth.；make progress 取得进步' },
+  { id: 4,  lv: 1, en: 'Education gives people more opportunities.', zh: '教育给人们更多的机会。', w: [13, 14], note: '' },
+  { id: 5,  lv: 1, en: 'We should protect the environment for our children.', zh: '我们应该为下一代保护环境。', w: [7], note: '' },
+  { id: 6,  lv: 1, en: 'Confidence is the first step to success.', zh: '自信是迈向成功的第一步。', w: [15, 11], note: 'the first step to ……的第一步' },
+  { id: 7,  lv: 1, en: 'Different people have different abilities.', zh: '不同的人有不同的能力。', w: [10, 9], note: '' },
+  { id: 8,  lv: 1, en: 'Reading is a good way to gain knowledge.', zh: '阅读是获得知识的好方法。', w: [3], note: 'a way to do sth. 做某事的方法' },
+  { id: 9,  lv: 1, en: 'Society needs people with knowledge and skills.', zh: '社会需要有知识和技能的人。', w: [16, 3], note: '' },
+  { id: 10, lv: 1, en: 'He has developed a good habit of getting up early.', zh: '他养成了早起的好习惯。', w: [8, 2], note: 'develop a habit of doing 养成做某事的习惯' },
+  { id: 11, lv: 1, en: 'Practice makes perfect.', zh: '熟能生巧。', w: [4], note: '英语谚语，注意汉译采用意译' },
+  // ---------- Lv2 基础 ----------
+  { id: 12, lv: 2, en: 'We should try our best to achieve our goals.', zh: '我们应该尽力实现自己的目标。', w: [17, 25], note: "try one's best to do 尽力做某事" },
+  { id: 13, lv: 2, en: 'Efficient communication can reduce misunderstandings.', zh: '高效的沟通可以减少误解。', w: [19, 21, 28], note: '' },
+  { id: 14, lv: 2, en: 'Technology has greatly changed our way of life.', zh: '科技极大地改变了我们的生活方式。', w: [22], note: '现在完成时表示对现在的影响' },
+  { id: 15, lv: 2, en: 'A positive attitude helps us face challenges.', zh: '积极的态度帮助我们面对挑战。', w: [24, 18], note: 'help sb. (to) do sth.' },
+  { id: 16, lv: 2, en: 'Everyone should be responsible for his own behavior.', zh: '每个人都应该对自己的行为负责。', w: [20], note: 'be responsible for 对……负责' },
+  { id: 17, lv: 2, en: 'The government should increase investment in education.', zh: '政府应该增加对教育的投入。', w: [29, 13], note: '' },
+  { id: 18, lv: 2, en: 'We must improve the quality of our products.', zh: '我们必须提高产品的质量。', w: [27, 1], note: '' },
+  { id: 19, lv: 2, en: 'The economy of this area is developing rapidly.', zh: '这个地区的经济正在迅速发展。', w: [30, 8], note: '' },
+  { id: 20, lv: 2, en: 'Culture has a deep influence on people\'s lives.', zh: '文化对人们的生活有着深刻的影响。', w: [31, 32], note: 'have an influence on 对……有影响' },
+  { id: 21, lv: 2, en: 'We should make full use of these resources.', zh: '我们应该充分利用这些资源。', w: [23], note: 'make full use of 充分利用' },
+  { id: 22, lv: 2, en: 'Hard work and effort lead to success.', zh: '勤奋和努力通向成功。', w: [26, 11], note: 'lead to 通向；导致' },
+  // ---------- Lv3 进阶 ----------
+  { id: 23, lv: 3, en: 'We should acquire knowledge through practice.', zh: '我们应该通过实践获得知识。', w: [33, 3, 4], note: '' },
+  { id: 24, lv: 3, en: 'This book gives a comprehensive introduction to English grammar.', zh: '这本书全面介绍了英语语法。', w: [34], note: 'give an introduction to 介绍……' },
+  { id: 25, lv: 3, en: 'Exercise plays a significant role in keeping healthy.', zh: '锻炼对保持健康起着重要作用。', w: [35, 37], note: 'play a significant role in 在……中起重要作用' },
+  { id: 26, lv: 3, en: 'Everyone can contribute to protecting the environment.', zh: '每个人都可以为保护环境做出贡献。', w: [36, 7], note: 'contribute to doing sth.，to 为介词' },
+  { id: 27, lv: 3, en: 'We should maintain a balance between work and rest.', zh: '我们应该保持工作与休息的平衡。', w: [37], note: 'maintain a balance between A and B' },
+  { id: 28, lv: 3, en: 'From my perspective, learning English requires long-term motivation.', zh: '在我看来，学习英语需要持久的动力。', w: [39, 47], note: "from one's perspective 在某人看来" },
+  { id: 29, lv: 3, en: 'We need to adapt to the changing society.', zh: '我们需要适应不断变化的社会。', w: [41, 16], note: 'adapt to 适应' },
+  { id: 30, lv: 3, en: 'Innovation is the driving force of development.', zh: '创新是发展的驱动力。', w: [42, 8], note: '' },
+  { id: 31, lv: 3, en: 'It is critical to develop a good learning strategy.', zh: '制定良好的学习策略至关重要。', w: [44, 40, 8], note: 'It is critical to do sth. 做某事至关重要' },
+  { id: 32, lv: 3, en: 'This phenomenon has attracted wide attention.', zh: '这一现象引起了广泛关注。', w: [45], note: 'attract attention 引起关注' },
+  { id: 33, lv: 3, en: 'Academic success depends on both effort and methods.', zh: '学业上的成功取决于努力和方法。', w: [46, 26, 11], note: 'depend on 取决于；both...and...' },
+  { id: 34, lv: 3, en: 'Every individual has the potential to succeed.', zh: '每个人都有成功的潜力。', w: [38, 48], note: 'have the potential to do 有做某事的潜力' },
+  { id: 35, lv: 3, en: 'We should follow a sustainable path of development.', zh: '我们应该走可持续发展的道路。', w: [43, 8], note: '' },
+  // ---------- Lv4 冲刺 ----------
+  { id: 36, lv: 4, en: 'We should not underestimate the importance of English.', zh: '我们不应低估英语的重要性。', w: [54, 5], note: 'the importance of ……的重要性' },
+  { id: 37, lv: 4, en: 'The government has taken measures to alleviate poverty.', zh: '政府已采取措施减轻贫困。', w: [49], note: 'take measures to do 采取措施做某事' },
+  { id: 38, lv: 4, en: 'The Internet has brought unprecedented changes to our lives.', zh: '互联网给我们的生活带来了前所未有的变化。', w: [50], note: 'bring changes to 给……带来变化' },
+  { id: 39, lv: 4, en: 'It is inevitable that technology will change our lives.', zh: '科技改变我们的生活是不可避免的。', w: [51, 22], note: 'It is inevitable that... ……是不可避免的' },
+  { id: 40, lv: 4, en: 'We should consolidate what we have learned.', zh: '我们应该巩固所学的知识。', w: [52], note: 'what 引导宾语从句' },
+  { id: 41, lv: 4, en: 'Convenient transportation can facilitate economic development.', zh: '便利的交通可以促进经济发展。', w: [53, 30, 8], note: '' },
+  { id: 42, lv: 4, en: 'The city is famous for its prosperity and diversity.', zh: '这座城市以其繁荣和多样性而闻名。', w: [55, 60], note: 'be famous for 以……闻名' },
+  { id: 43, lv: 4, en: 'The government should improve the infrastructure of the city.', zh: '政府应该改善城市的基础设施。', w: [56, 1], note: '' },
+  { id: 44, lv: 4, en: 'We should take the initiative to learn new things.', zh: '我们应该主动学习新事物。', w: [57], note: 'take the initiative to do 主动做某事' },
+  { id: 45, lv: 4, en: 'The reform has had a profound influence on society.', zh: '改革对社会产生了深远的影响。', w: [58, 32, 16], note: 'have a profound influence on 对……有深远影响' },
+  { id: 46, lv: 4, en: 'We must accelerate the pace of reform.', zh: '我们必须加快改革的步伐。', w: [59], note: 'the pace of ……的步伐' },
+  { id: 47, lv: 4, en: 'The Internet has transformed the way we communicate.', zh: '互联网改变了我们交流的方式。', w: [61, 21], note: 'the way (that) we communicate，省略关系词的定语从句' },
+  { id: 48, lv: 4, en: 'We should consider the consequences of our actions.', zh: '我们应该考虑自己行为的后果。', w: [62], note: '' },
+  { id: 49, lv: 4, en: 'Education should be given top priority.', zh: '教育应该被放在优先位置。', w: [63, 13], note: '被动语态；top priority 最优先事项' },
+  { id: 50, lv: 4, en: 'The country has made substantial progress in science.', zh: '这个国家在科学方面取得了巨大的进步。', w: [64, 12], note: 'make progress in 在……方面取得进步' }
+];
+
+module.exports = { SENTENCES };

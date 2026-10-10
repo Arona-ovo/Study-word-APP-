@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="card head-card" wx:if="{{list.length > 0}}">
+    <view class="head-text">共 {{list.length}} 道错题，重练答对后自动移出</view>
+    <button class="btn-primary head-btn" bindtap="startReview">开始错题重练</button>
+  </view>
+
+  <view wx:if="{{list.length === 0}}" class="empty">
+    <view class="empty-title">暂无错题</view>
+    <view class="empty-sub">答错的题目会自动收录到这里</view>
+  </view>
+
+  <view wx:for="{{list}}" wx:key="sid" class="card wrong-item">
+    <view class="wrong-meta">
+      <text class="tag dir-tag">{{item.dir === 'e2c' ? '英译汉' : '汉译英'}}</text>
+      <text class="wrong-time">{{item.timeStr}}</text>
+    </view>
+    <view class="wrong-prompt">{{item.prompt}}</view>
+    <view class="wrong-answer-row" wx:if="{{item.userAnswer}}">
+      <text class="wrong-label">你的答案</text>
+      <text class="wrong-user">{{item.userAnswer}}</text>
+    </view>
+    <view class="wrong-answer-row">
+      <text class="wrong-label">参考答案</text>
+      <text class="wrong-ref">{{item.answer}}</text>
+    </view>
+  </view>
+</view>
